@@ -7,6 +7,7 @@ LIBS     = $(addprefix -l,$(LIBRARIES))
 
 LIBNAME  = amqpcpp
 LIBFILE  = lib$(LIBNAME).a
+LIBFILESO  = lib$(LIBNAME).so
 
 SOURCES  = src/AMQP.cpp src/AMQPBase.cpp src/AMQPException.cpp src/AMQPMessage.cpp src/AMQPExchange.cpp src/AMQPQueue.cpp
 EXFILES  = example_publish.cpp example_consume.cpp example_get.cpp
@@ -14,12 +15,17 @@ EXAMPLES = $(EXFILES:.cpp=)
 OBJECTS  = $(SOURCES:.cpp=.o)
 
 
-all: lib $(EXAMPLES)
+all: lib libso $(EXAMPLES)
 
 lib: $(LIBFILE)
 
 $(LIBFILE): $(OBJECTS)
 	$(AR) rcs $@ $(OBJECTS)
+
+libso: $(LIBFILESO)
+
+$(LIBFILESO): $(OBJECTS)
+	$(CXX) $(CPPFLAGS) -shared -o $@ $(OBJECTS)
 
 $(EXAMPLES): $(addprefix examples/,$(EXFILES)) $(LIBFILE)
 	$(CXX) $(CPPFLAGS) -o $@ examples/$@.cpp $(LIBFILE) $(LIBS)
