@@ -1,13 +1,12 @@
 CXX      = g++
 CFLAGS   = -Wall
-CPPFLAGS = $(CFLAGS) -D_REENTRANT -fPIC -I/usr/local/include -L/usr/local/lib -Iinclude/
+CPPFLAGS = $(CFLAGS) -I/usr/local/include -L/usr/local/lib -Iinclude/
 
 LIBRARIES= rabbitmq
 LIBS     = $(addprefix -l,$(LIBRARIES))
 
 LIBNAME  = amqpcpp
 LIBFILE  = lib$(LIBNAME).a
-LIBFILESO  = lib$(LIBNAME).so
 
 SOURCES  = src/AMQP.cpp src/AMQPBase.cpp src/AMQPException.cpp src/AMQPMessage.cpp src/AMQPExchange.cpp src/AMQPQueue.cpp
 EXFILES  = example_publish.cpp example_consume.cpp example_get.cpp
@@ -15,17 +14,12 @@ EXAMPLES = $(EXFILES:.cpp=)
 OBJECTS  = $(SOURCES:.cpp=.o)
 
 
-all: lib libso $(EXAMPLES)
+all: lib $(EXAMPLES)
 
 lib: $(LIBFILE)
 
 $(LIBFILE): $(OBJECTS)
 	$(AR) rcs $@ $(OBJECTS)
-
-libso: $(LIBFILESO)
-
-$(LIBFILESO): $(OBJECTS)
-	$(CXX) $(CPPFLAGS) -shared -o $@ $(OBJECTS)
 
 $(EXAMPLES): $(addprefix examples/,$(EXFILES)) $(LIBFILE)
 	$(CXX) $(CPPFLAGS) -o $@ examples/$@.cpp $(LIBFILE) $(LIBS)
